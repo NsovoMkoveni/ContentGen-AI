@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ContentGen AI | Content Generator</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div class="logo">
+            ✨ ContentGen AI
+        </div>
+
+        <button
+            id="themeButton"
+            onclick="toggleTheme()"
+        >
+            🌙
+        </button>
+
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main>
+
+        <!-- HERO SECTION -->
+
+        <section class="hero">
+
+            <p class="tag">
+                AI-POWERED CONTENT CREATOR
+            </p>
+
+            <h1>
+                Create amazing content
+                <span>in seconds.</span>
+            </h1>
+
+            <p>
+                Generate professional blogs, social media posts,
+                emails and more with the help of AI.
+            </p>
+
+        </section>
+
+
+        <!-- GENERATOR -->
+
+        <section class="generator">
+
+
+            <!-- LEFT SIDE -->
+
+            <div class="form-section">
+
+                <label for="topic">
+                    What do you want to write about?
+                </label>
+
+                <textarea
+                    id="topic"
+                    placeholder="Example: The importance of cybersecurity awareness..."
+                ></textarea>
+
+
+                <!-- CONTENT TYPE AND TONE -->
+
+                <div class="row">
+
+                    <div>
+
+                        <label for="contentType">
+                            Content Type
+                        </label>
+
+                        <select id="contentType">
+
+                            <option>
+                                Blog Post
+                            </option>
+
+                            <option>
+                                Social Media Caption
+                            </option>
+
+                            <option>
+                                LinkedIn Post
+                            </option>
+
+                            <option>
+                                Professional Email
+                            </option>
+
+                            <option>
+                                Advertisement
+                            </option>
+
+                            <option>
+                                YouTube Description
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="tone">
+                            Tone
+                        </label>
+
+                        <select id="tone">
+
+                            <option>
+                                Professional
+                            </option>
+
+                            <option>
+                                Friendly
+                            </option>
+
+                            <option>
+                                Casual
+                            </option>
+
+                            <option>
+                                Persuasive
+                            </option>
+
+                            <option>
+                                Creative
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- AUDIENCE AND LENGTH -->
+
+                <div class="row">
+
+                    <div>
+
+                        <label for="audience">
+                            Target Audience
+                        </label>
+
+                        <input
+                            id="audience"
+                            type="text"
+                            placeholder="Example: IT students"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="length">
+                            Length
+                        </label>
+
+                        <select id="length">
+
+                            <option>
+                                Short
+                            </option>
+
+                            <option selected>
+                                Medium
+                            </option>
+
+                            <option>
+                                Long
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- GENERATE BUTTON -->
+
+                <button
+                    class="generate-button"
+                    onclick="generateContent()"
+                >
+                    ✨ Generate Content
+                </button>
+
+            </div>
+
+
+            <!-- RIGHT SIDE -->
+
+            <div class="result-section">
+
+
+                <!-- RESULT HEADER -->
+
+                <div class="result-header">
+
+                    <h2>
+                        Generated Content
+                    </h2>
+
+                    <span id="wordCount">
+                        0 words
+                    </span>
+
+                </div>
+
+
+                <!-- RESULT BOX -->
+
+                <div
+                    id="result"
+                    class="result-box"
+                >
+
+                    <div class="empty-state">
+
+                        <div class="icon">
+                            ✍️
+                        </div>
+
+                        <h3>
+                            Your content will appear here
+                        </h3>
+
+                        <p>
+                            Enter a topic and click
+                            "Generate Content" to get started.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTION BUTTONS -->
+
+                <div class="actions">
+
+                    <button onclick="generateContent()">
+                        🔄 Regenerate
+                    </button>
+
+                    <button onclick="copyContent()">
+                        📋 Copy
+                    </button>
+
+                    <button onclick="downloadContent()">
+                        ⬇️ Download
+                    </button>
+
+                    <button onclick="saveToHistory()">
+                        💾 Save
+                    </button>
+
+                    <button onclick="clearContent()">
+                        🗑️ Clear
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- HISTORY SECTION -->
+
+        <section class="history-section">
+
+            <div class="history-header">
+
+                <h2>
+                    📚 Content History
+                </h2>
+
+                <button
+                    class="clear-history-button"
+                    onclick="clearHistory()"
+                >
+                    Clear History
+                </button>
+
+            </div>
+
+
+            <div id="historyList">
+
+                <div class="history-empty">
+
+                    <div class="icon">
+                        📝
+                    </div>
+
+                    <p>
+                        Your saved content will appear here.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            Built by <strong>Nsovo Mkoveni</strong> |
+            IT Network Management
+        </p>
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script
+        src="{{ url_for('static', filename='script.js') }}"
+    ></script>
+
+</body>
+
+</html>

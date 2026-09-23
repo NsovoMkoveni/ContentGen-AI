@@ -1,0 +1,605 @@
+/* ==========================================
+   GENERAL
+   ========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+    min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+
+/* ==========================================
+   HEADER
+   ========================================== */
+
+header {
+    height: 70px;
+    background: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 7%;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+#themeButton {
+    border: none;
+    background: #eef2ff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+
+/* ==========================================
+   MAIN
+   ========================================== */
+
+main {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+
+/* ==========================================
+   HERO
+   ========================================== */
+
+.hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+}
+
+.tag {
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.hero h1 {
+    font-size: 48px;
+    line-height: 1.15;
+    margin-bottom: 20px;
+}
+
+.hero h1 span {
+    display: block;
+}
+
+.hero p:last-child {
+    color: #667085;
+    font-size: 18px;
+}
+
+
+/* ==========================================
+   GENERATOR
+   ========================================== */
+
+.generator {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 50px;
+}
+
+.form-section,
+.result-section {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+/* ==========================================
+   FORM
+   ========================================== */
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+textarea,
+input,
+select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #d8dce5;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    background: white;
+    color: #172033;
+    transition: background 0.3s ease,
+                color 0.3s ease,
+                border-color 0.3s ease;
+}
+
+textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+textarea:focus,
+input:focus,
+select:focus {
+    border-color: #667eea;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+
+/* ==========================================
+   GENERATE BUTTON
+   ========================================== */
+
+.generate-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #172033;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.generate-button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+
+/* ==========================================
+   RESULT
+   ========================================== */
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.result-header h2 {
+    font-size: 20px;
+}
+
+#wordCount {
+    color: #667085;
+    font-size: 14px;
+}
+
+.result-box {
+    min-height: 350px;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 20px;
+    white-space: pre-wrap;
+    line-height: 1.7;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+
+/* ==========================================
+   EMPTY STATE
+   ========================================== */
+
+.empty-state {
+    text-align: center;
+    padding-top: 90px;
+    color: #667085;
+}
+
+.empty-state .icon {
+    font-size: 45px;
+    margin-bottom: 15px;
+}
+
+.empty-state h3 {
+    color: #172033;
+    margin-bottom: 8px;
+}
+
+
+/* ==========================================
+   ACTION BUTTONS
+   ========================================== */
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.actions button {
+    flex: 1;
+    padding: 11px;
+    border: 1px solid #d8dce5;
+    background: white;
+    color: #172033;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease,
+                color 0.3s ease,
+                border-color 0.3s ease;
+}
+
+.actions button:hover {
+    background: #f1f3f7;
+}
+
+
+/* ==========================================
+   HISTORY
+   ========================================== */
+
+.history-section {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    margin-bottom: 50px;
+    transition: background 0.3s ease;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.history-header h2 {
+    font-size: 20px;
+}
+
+.clear-history-button {
+    border: 1px solid #d8dce5;
+    background: white;
+    color: #172033;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.clear-history-button:hover {
+    background: #f1f3f7;
+}
+
+
+/* ==========================================
+   HISTORY CARDS
+   ========================================== */
+
+.history-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 15px;
+    background: #f8fafc;
+    transition: background 0.3s ease,
+                border-color 0.3s ease;
+}
+
+.history-card:last-child {
+    margin-bottom: 0;
+}
+
+.history-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.history-card-header span {
+    font-weight: bold;
+}
+
+.history-card-header small {
+    color: #667085;
+    font-size: 12px;
+}
+
+.history-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.history-details span {
+    background: #eef2ff;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.history-topic {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.history-content {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    max-height: 250px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+
+
+/* ==========================================
+   HISTORY BUTTONS
+   ========================================== */
+
+.history-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.history-actions button {
+    padding: 9px 14px;
+    border: 1px solid #d8dce5;
+    background: white;
+    color: #172033;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.history-actions button:hover {
+    background: #eef2ff;
+}
+
+
+/* ==========================================
+   EMPTY HISTORY
+   ========================================== */
+
+.history-empty {
+    text-align: center;
+    padding: 45px 20px;
+    color: #667085;
+}
+
+.history-empty .icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+}
+
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+
+footer {
+    text-align: center;
+    padding: 30px;
+    color: #667085;
+}
+
+
+/* ==========================================
+   DARK MODE
+   ========================================== */
+
+.dark {
+    background: #101522;
+    color: #f8fafc;
+}
+
+
+/* Header */
+
+.dark header {
+    background: #182033;
+    border-color: #39445a;
+}
+
+
+/* Hero */
+
+.dark .hero p:last-child {
+    color: #aab2c5;
+}
+
+
+/* Cards */
+
+.dark .form-section,
+.dark .result-section,
+.dark .history-section {
+    background: #182033;
+}
+
+
+/* Form */
+
+.dark textarea,
+.dark input,
+.dark select {
+    background: #101522;
+    color: #f8fafc;
+    border-color: #39445a;
+}
+
+
+/* Result */
+
+.dark .result-box {
+    background: #101522;
+    color: #f8fafc;
+}
+
+.dark #wordCount {
+    color: #aab2c5;
+}
+
+
+/* Empty state */
+
+.dark .empty-state {
+    color: #aab2c5;
+}
+
+.dark .empty-state h3 {
+    color: #f8fafc;
+}
+
+
+/* Buttons */
+
+.dark .actions button,
+.dark .history-actions button,
+.dark .clear-history-button {
+    background: #182033;
+    color: #f8fafc;
+    border-color: #39445a;
+}
+
+.dark .actions button:hover,
+.dark .history-actions button:hover,
+.dark .clear-history-button:hover {
+    background: #27324a;
+}
+
+
+/* History */
+
+.dark .history-card {
+    background: #101522;
+    border-color: #39445a;
+}
+
+.dark .history-card-header small {
+    color: #aab2c5;
+}
+
+.dark .history-details span {
+    background: #27324a;
+}
+
+.dark .history-content {
+    background: #182033;
+    color: #f8fafc;
+}
+
+.dark .history-empty {
+    color: #aab2c5;
+}
+
+
+/* Theme button */
+
+.dark #themeButton {
+    background: #27324a;
+}
+
+
+/* Footer */
+
+.dark footer {
+    color: #aab2c5;
+}
+
+
+/* ==========================================
+   MOBILE
+   ========================================== */
+
+@media (max-width: 800px) {
+
+    .generator {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 36px;
+    }
+
+    .row {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .hero {
+        padding-top: 40px;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .hero p:last-child {
+        font-size: 16px;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    header {
+        padding: 0 5%;
+    }
+
+    .history-header {
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .history-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .history-actions {
+        flex-direction: column;
+    }
+
+    .history-actions button {
+        width: 100%;
+    }
+
+}
