@@ -1,335 +1,130 @@
 from flask import Flask, render_template, request, jsonify
-import random
 
 app = Flask(__name__)
-
-
-# ==========================================
-# HOME PAGE
-# ==========================================
 
 @app.route("/")
 def home():
     return render_template("index.html")
 
-
-# ==========================================
-# CONTENT GENERATOR
-# ==========================================
-
 @app.route("/generate", methods=["POST"])
 def generate():
-
     data = request.get_json()
+
+    if not data:
+        return jsonify({"error": "No information was received."}), 400
 
     topic = data.get("topic", "").strip()
     content_type = data.get("content_type", "Blog Post")
     tone = data.get("tone", "Professional")
-    audience = data.get(
-        "audience",
-        "General audience"
-    ).strip()
-
+    audience = data.get("audience", "General audience").strip()
     length = data.get("length", "Medium")
 
-
-    # ==========================================
-    # CHECK TOPIC
-    # ==========================================
-
     if not topic:
+        return jsonify({"error": "Please enter a topic."}), 400
 
-        return jsonify({
-            "error": "Please enter a topic."
-        }), 400
+    if length == "Short":
+        paragraph_count = 2
+    elif length == "Long":
+        paragraph_count = 5
+    else:
+        paragraph_count = 3
 
+    if content_type == "Blog Post":
+        content = generate_blog(topic, tone, audience, paragraph_count)
+    elif content_type == "Social Media Caption":
+        content = generate_social(topic, audience)
+    elif content_type == "LinkedIn Post":
+        content = generate_linkedin(topic, audience)
+    elif content_type == "Professional Email":
+        content = generate_email(topic, audience)
+    elif content_type == "Advertisement":
+        content = generate_advertisement(topic, audience)
+    elif content_type == "YouTube Description":
+        content = generate_youtube(topic, audience)
+    else:
+        content = generate_blog(topic, tone, audience, paragraph_count)
 
-    # ==========================================
-    # TONE INTRODUCTIONS
-    # ==========================================
-
-    tone_intros = {
-
-        "Professional":
-            f"Understanding {topic.lower()} is increasingly important for {audience}.",
-
-        "Friendly":
-            f"Let's take a closer look at {topic.lower()} and why it matters for {audience}.",
-
-        "Casual":
-            f"Have you ever wondered why {topic.lower()} is important for {audience}?",
-
-        "Persuasive":
-            f"Now is a great time for {audience} to learn more about {topic.lower()}.",
-
-        "Creative":
-            f"Imagine a world where {topic.lower()} becomes a powerful part of everyday learning and innovation."
-
-    }
+    return jsonify({"content": content})
 
 
-    intro = tone_intros.get(
-        tone,
-        tone_intros["Professional"]
-    )
-
-
-    # ==========================================
-    # VARIATION SENTENCES
-    # ==========================================
-
-    variations = [
-
-        f"Learning about {topic.lower()} can help people develop valuable knowledge and practical skills.",
-
-        f"For {audience}, understanding {topic.lower()} can create opportunities for learning and professional development.",
-
-        f"Practical experience with {topic.lower()} can make it easier to understand how technology is used in real-world situations.",
-
-        f"Continuous learning is important because technology and industry requirements continue to change.",
-
-        f"Combining theoretical knowledge with practical projects can make learning about {topic.lower()} more meaningful."
-
+def generate_blog(topic, tone, audience, paragraph_count):
+    paragraphs = [
+        f"{topic} is an important topic for {audience}. Understanding the key ideas behind {topic} can help individuals and organisations make better decisions and respond effectively to changing needs.",
+        f"One important aspect of {topic} is the practical opportunities it can create. By developing a clear understanding of the subject, {audience} can identify challenges, improve their approach and achieve meaningful results.",
+        f"Another important consideration is consistent improvement. A {tone.lower()} approach to {topic} encourages people to remain informed, adapt to new developments and focus on solutions that provide long-term value.",
+        f"For {audience}, taking action is an effective way to turn knowledge into results. Starting with realistic goals, measuring progress and learning from experience can make the process more effective.",
+        f"In conclusion, {topic} provides valuable opportunities for growth and improvement. With the right knowledge, planning and consistent action, {audience} can create positive outcomes."
     ]
 
+    title = f"{topic}: A Practical Guide"
 
-    selected_variations = random.sample(
-        variations,
-        2 if length == "Short"
-        else 3 if length == "Medium"
-        else 5
-    )
+    return title + "\n\n" + "\n\n".join(paragraphs[:paragraph_count])
 
 
-    # ==========================================
-    # LINKEDIN POST
-    # ==========================================
+def generate_social(topic, audience):
+    return f"""🚀 {topic}
 
-    if content_type == "LinkedIn Post":
+Discover practical insights and useful ideas that can help {audience} understand and make the most of {topic}.
 
-        content = f"""🚀 {topic}
+Stay informed. Keep learning. Keep growing. Your next opportunity could start with one new idea today. 💡
 
-{intro}
-
-{selected_variations[0]}
-
-{selected_variations[1]}
-
-Keep learning. Keep practising. Keep growing. 💻🚀
-
-#IT #Technology #Learning #CareerDevelopment #ProfessionalGrowth"""
+#Innovation #Growth #Learning #Success"""
 
 
-        if length == "Long":
+def generate_linkedin(topic, audience):
+    return f"""💡 Why {topic} matters
 
-            content += f"""
+In today's changing environment, understanding {topic} has become increasingly valuable for {audience}.
 
-Here are a few areas worth focusing on:
+A strong understanding of this topic can help professionals identify opportunities, solve problems and make more informed decisions.
 
-💡 Build a strong understanding of the fundamentals.
+Continuous learning and practical experience are important parts of professional growth. Exploring topics such as {topic} can help us develop new skills and perspectives.
 
-🛠️ Gain practical experience through projects.
+What are your thoughts on {topic}?
 
-📚 Continue learning as technology changes.
-
-🤝 Connect with other students and professionals.
-
-What skills are you currently working on developing?
-
-#SkillsDevelopment #FutureOfTechnology"""
+#ProfessionalDevelopment #Technology #Learning #CareerGrowth"""
 
 
-    # ==========================================
-    # YOUTUBE DESCRIPTION
-    # ==========================================
+def generate_email(topic, audience):
+    return f"""Subject: Regarding {topic}
 
-    elif content_type == "YouTube Description":
-
-        content = f"""🎥 {topic} | Beginner-Friendly Guide
-
-Welcome to the channel! 👋
-
-In this video, we explore {topic.lower()} and explain why it matters for {audience}.
-
-{selected_variations[0]}
-
-You will learn:
-
-✅ The basic concepts
-✅ Why the topic is important
-✅ Practical considerations
-✅ Useful learning tips
-
-Whether you are a beginner or looking to improve your knowledge, this video provides a useful starting point.
-
-👍 Like
-💬 Comment
-🔔 Subscribe
-
-#IT #Technology #Education #Learning"""
-
-
-        if length == "Long":
-
-            content += f"""
-
-By the end of the video, you should have a clearer understanding of {topic.lower()} and how it can be applied in practical situations.
-
-Keep learning and exploring new technology! 🚀"""
-
-
-    # ==========================================
-    # PROFESSIONAL EMAIL
-    # ==========================================
-
-    elif content_type == "Professional Email":
-
-        content = f"""Subject: Regarding {topic}
-
-Dear Sir/Madam,
+Dear {audience},
 
 I hope you are doing well.
 
-I am writing to discuss {topic.lower()} and its relevance to {audience}.
+I am writing to share some information regarding {topic}. This is an important area that may provide valuable opportunities for improvement and growth.
 
-{selected_variations[0]}
+I would appreciate the opportunity to discuss this further and explore possible next steps.
 
-{selected_variations[1]}
-
-I would appreciate the opportunity to learn more about this subject and gain practical experience where possible.
-
-Thank you for your time and consideration.
+Please let me know if you would be available for a discussion at a convenient time.
 
 Kind regards,
 Nsovo Mkoveni"""
 
 
-    # ==========================================
-    # ADVERTISEMENT
-    # ==========================================
+def generate_advertisement(topic, audience):
+    return f"""✨ Discover {topic}!
 
-    elif content_type == "Advertisement":
+Looking for a better way to improve your experience with {topic}? Our solution is designed to provide practical value, convenience and meaningful results for {audience}.
 
-        content = f"""✨ Discover {topic}!
+Don't miss the opportunity to discover what is possible.
 
-Are you part of {audience} and looking for an opportunity to learn something valuable?
-
-{selected_variations[0]}
-
-🌟 Learn
-💡 Grow
-🚀 Build your future
-
-Start exploring {topic.lower()} today and take the next step toward developing your skills.
-
-📩 Contact us to learn more."""
+🚀 Explore {topic} today!"""
 
 
-    # ==========================================
-    # SOCIAL MEDIA CAPTION
-    # ==========================================
+def generate_youtube(topic, audience):
+    return f"""🎥 Welcome to this video about {topic}!
 
-    elif content_type == "Social Media Caption":
+In this video, we explore the key ideas, benefits and practical information you need to know about {topic}.
 
-        content = f"""💻 {topic}
+This video is useful for {audience} who want to learn more and develop a better understanding of the subject.
 
-{intro}
+👍 Like the video if you found it useful.
+💬 Share your thoughts in the comments.
+🔔 Subscribe for more content.
 
-{selected_variations[0]}
+#Learning #Technology #Education #Growth"""
 
-{selected_variations[1]}
-
-Keep learning. Keep growing. Keep building your future. 🚀
-
-#IT #Technology #Learning #Growth #CareerDevelopment"""
-
-
-    # ==========================================
-    # BLOG POST
-    # ==========================================
-
-    else:
-
-        content = f"""# {topic}
-
-## Introduction
-
-{intro}
-
-{selected_variations[0]}
-
-## Why It Matters
-
-{selected_variations[1]}
-
-Understanding {topic.lower()} can help people solve problems, develop useful skills and prepare for future opportunities.
-
-## Practical Learning
-
-{selected_variations[-1]}
-
-Hands-on projects, research and continuous practice can help turn theoretical knowledge into practical skills.
-
-"""
-
-
-        if length == "Medium":
-
-            content += f"""## Key Points
-
-• Learn the fundamentals of {topic.lower()}.
-
-• Practise through real-world projects.
-
-• Continue developing your skills.
-
-## Conclusion
-
-Learning about {topic.lower()} can provide valuable knowledge for {audience}. Combining theory with practical experience can make the learning journey more effective."""
-
-
-        elif length == "Long":
-
-            content += f"""## Key Areas to Consider
-
-### 1. Build Strong Foundations
-
-A good understanding of the fundamentals can make it easier to develop more advanced skills.
-
-### 2. Gain Practical Experience
-
-Working on projects can help {audience} understand how {topic.lower()} is applied in real situations.
-
-### 3. Keep Learning
-
-Technology continues to develop, which means continuous learning is an important part of professional growth.
-
-### 4. Develop Problem-Solving Skills
-
-Understanding how to analyse challenges and find practical solutions can be valuable when working with technology.
-
-## Conclusion
-
-{topic} is a valuable subject for {audience} to explore.
-
-By combining knowledge, practical experience and continuous learning, individuals can continue developing skills that may support their education and future careers."""
-
-
-    # ==========================================
-    # RETURN RESULT
-    # ==========================================
-
-    return jsonify({
-        "content": content
-    })
-
-
-# ==========================================
-# START FLASK SERVER
-# ==========================================
 
 if __name__ == "__main__":
-
-    app.run(
-        debug=True
-    )
+    app.run(debug=True, host="127.0.0.1", port=5000)

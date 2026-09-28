@@ -1,640 +1,425 @@
-// ==========================================
-// CONTENT GENERATOR
-// ==========================================
+document.addEventListener("DOMContentLoaded", function () {
 
-async function generateContent() {
+    const themeButton = document.getElementById("themeButton");
+    const generateButton = document.getElementById("generateButton");
+    const topicInput = document.getElementById("topic");
+    const contentType = document.getElementById("contentType");
+    const tone = document.getElementById("tone");
+    const audience = document.getElementById("audience");
+    const length = document.getElementById("length");
 
-    const topic =
-        document.getElementById("topic").value.trim();
+    const result = document.getElementById("result");
+    const wordCount = document.getElementById("wordCount");
+    const statusMessage = document.getElementById("statusMessage");
 
-    const contentType =
-        document.getElementById("contentType").value;
+    const copyButton = document.getElementById("copyButton");
+    const downloadButton = document.getElementById("downloadButton");
+    const saveButton = document.getElementById("saveButton");
+    const clearButton = document.getElementById("clearButton");
+    const regenerateButton = document.getElementById("regenerateButton");
 
-    const tone =
-        document.getElementById("tone").value;
+    const historyList = document.getElementById("historyList");
+    const clearHistoryButton = document.getElementById("clearHistoryButton");
 
-    const audience =
-        document.getElementById("audience").value.trim() ||
-        "General audience";
-
-    const length =
-        document.getElementById("length").value;
-
-    const result =
-        document.getElementById("result");
+    let currentContent = "";
 
 
-    // Check if the user entered a topic
+    // =========================
+    // DARK MODE
+    // =========================
 
-    if (!topic) {
+    function loadTheme() {
+        const savedTheme = localStorage.getItem("contentGenTheme");
 
-        alert("Please enter a topic first.");
-
-        return;
+        if (savedTheme === "dark") {
+            document.body.classList.add("dark");
+            themeButton.textContent = "☀️";
+        } else {
+            document.body.classList.remove("dark");
+            themeButton.textContent = "🌙";
+        }
     }
 
 
-    // Show loading message
+    function toggleTheme() {
+        document.body.classList.toggle("dark");
 
-    result.innerHTML = `
-        <div class="empty-state">
-
-            <div class="icon">
-                ⏳
-            </div>
-
-            <h3>
-                Generating your content...
-            </h3>
-
-            <p>
-                Please wait.
-            </p>
-
-        </div>
-    `;
+        if (document.body.classList.contains("dark")) {
+            localStorage.setItem("contentGenTheme", "dark");
+            themeButton.textContent = "☀️";
+        } else {
+            localStorage.setItem("contentGenTheme", "light");
+            themeButton.textContent = "🌙";
+        }
+    }
 
 
-    try {
+    // =========================
+    // GENERATE CONTENT
+    // =========================
 
-        // Send information to Flask backend
+    async function generateContent() {
 
-        const response = await fetch("/generate", {
+        const topic = topicInput.value.trim();
 
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                topic: topic,
-
-                content_type: contentType,
-
-                tone: tone,
-
-                audience: audience,
-
-                length: length
-
-            })
-
-        });
-
-
-        const data = await response.json();
-
-
-        // Check for errors
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.error || "Something went wrong."
-            );
-
+        if (!topic) {
+            statusMessage.textContent = "Please enter a topic first.";
+            statusMessage.className = "status-message error";
+            topicInput.focus();
+            return;
         }
 
+        statusMessage.textContent = "Generating content...";
+        statusMessage.className = "status-message loading";
 
-        // Display generated content
+        generateButton.disabled = true;
+        generateButton.textContent = "Generating...";
 
-        result.textContent = data.content;
+        try {
 
+            const response = await fetch("/generate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    topic: topic,
+                    content_type: contentType.value,
+                    tone: tone.value,
+                    audience: audience.value || "General audience",
+                    length: length.value
+                })
+            });
 
-        // Update word count
+            const data = await response.json();
 
-        updateWordCount(data.content);
+            if (!response.ok) {
+                throw new Error(data.error || "Something went wrong.");
+            }
 
+            currentContent = data.content;
+
+            result.textContent = currentContent;
+
+            updateWordCount();
+
+            statusMessage.textContent = "Content generated successfully!";
+            statusMessage.className = "status-message success";
+
+        } catch (error) {
+
+            console.error("Generation error:", error);
+
+            statusMessage.textContent =
+                "Unable to generate content. Please try again.";
+
+            statusMessage.className = "status-message error";
+
+        } finally {
+
+            generateButton.disabled = false;
+            generateButton.innerHTML = "<span>✨</span> Generate Content";
+        }
     }
 
 
-    catch (error) {
+    // =========================
+    // WORD COUNT
+    // =========================
 
-        result.textContent =
-            "Something went wrong: " +
-            error.message;
+    function updateWordCount() {
 
-    }
+        if (!currentContent.trim()) {
+            wordCount.textContent = "0 words";
+            return;
+        }
 
-}
+        const words = currentContent.trim().split(/\s+/).length;
 
-
-
-// ==========================================
-// WORD COUNT
-// ==========================================
-
-function updateWordCount(text) {
-
-    const words = text
-        .trim()
-        .split(/\s+/)
-        .filter(word => word.length > 0);
-
-
-    document.getElementById("wordCount").textContent =
-        words.length + " words";
-
-}
-
-
-
-// ==========================================
-// COPY CONTENT
-// ==========================================
-
-function copyContent() {
-
-    const text =
-        document.getElementById("result").innerText;
-
-
-    if (!text.trim()) {
-
-        alert("There is no content to copy.");
-
-        return;
+        wordCount.textContent =
+            words + (words === 1 ? " word" : " words");
     }
 
 
-    navigator.clipboard.writeText(text)
+    // =========================
+    // COPY
+    // =========================
 
-        .then(() => {
+    async function copyContent() {
 
-            alert("Content copied successfully!");
+        if (!currentContent) {
+            alert("There is no content to copy.");
+            return;
+        }
 
-        })
+        try {
 
-        .catch(() => {
+            await navigator.clipboard.writeText(currentContent);
 
-            alert("Unable to copy the content.");
+            statusMessage.textContent = "Content copied!";
+            statusMessage.className = "status-message success";
 
-        });
+        } catch (error) {
 
-}
-
-
-
-// ==========================================
-// DOWNLOAD CONTENT
-// ==========================================
-
-function downloadContent() {
-
-    const text =
-        document.getElementById("result").innerText;
-
-
-    if (!text.trim()) {
-
-        alert("There is no content to download.");
-
-        return;
+            alert("Unable to copy content.");
+        }
     }
 
 
-    const blob =
-        new Blob([text], {
+    // =========================
+    // DOWNLOAD
+    // =========================
 
-            type: "text/plain"
+    function downloadContent() {
 
-        });
+        if (!currentContent) {
+            alert("There is no content to download.");
+            return;
+        }
 
+        const blob = new Blob(
+            [currentContent],
+            { type: "text/plain" }
+        );
 
-    const url =
-        URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
 
+        const link = document.createElement("a");
 
-    const link =
-        document.createElement("a");
+        link.href = url;
+        link.download = "contentgen-content.txt";
 
+        document.body.appendChild(link);
 
-    link.href = url;
+        link.click();
 
-    link.download =
-        "generated-content.txt";
+        document.body.removeChild(link);
 
-
-    document.body.appendChild(link);
-
-    link.click();
-
-    document.body.removeChild(link);
-
-
-    URL.revokeObjectURL(url);
-
-}
-
+        URL.revokeObjectURL(url);
+    }
 
 
-// ==========================================
-// CLEAR CURRENT CONTENT
-// ==========================================
+    // =========================
+    // CLEAR RESULT
+    // =========================
 
-function clearContent() {
+    function clearContent() {
 
-    document.getElementById("result").innerHTML = `
+        currentContent = "";
 
-        <div class="empty-state">
-
-            <div class="icon">
-                ✍️
+        result.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">✨</div>
+                <h3>Your content will appear here</h3>
+                <p>Enter your idea above and click Generate Content.</p>
             </div>
-
-            <h3>
-                Your content will appear here
-            </h3>
-
-            <p>
-                Enter a topic and click
-                "Generate Content" to get started.
-            </p>
-
-        </div>
-
-    `;
-
-
-    document.getElementById("wordCount").textContent =
-        "0 words";
-
-}
-
-
-
-// ==========================================
-// SAVE CONTENT TO HISTORY
-// ==========================================
-
-function saveToHistory() {
-
-    const content =
-        document.getElementById("result").innerText.trim();
-
-
-    // Make sure there is content
-
-    if (!content) {
-
-        alert("There is no content to save.");
-
-        return;
-    }
-
-
-    // Get existing history
-
-    let history =
-        JSON.parse(
-            localStorage.getItem("contentHistory")
-        ) || [];
-
-
-    // Create a new history item
-
-    const historyItem = {
-
-        id: Date.now(),
-
-        content: content,
-
-        date: new Date().toLocaleString()
-
-    };
-
-
-    // Add newest content to the beginning
-
-    history.unshift(historyItem);
-
-
-    // Save history in browser
-
-    localStorage.setItem(
-        "contentHistory",
-        JSON.stringify(history)
-    );
-
-
-    // Update the history section
-
-    displayHistory();
-
-
-    alert("Content saved to history!");
-
-}
-
-
-
-// ==========================================
-// DISPLAY HISTORY
-// ==========================================
-
-function displayHistory() {
-
-    const historyList =
-        document.getElementById("historyList");
-
-
-    // Get saved history
-
-    const history =
-        JSON.parse(
-            localStorage.getItem("contentHistory")
-        ) || [];
-
-
-    // If there is no history
-
-    if (history.length === 0) {
-
-        historyList.innerHTML = `
-
-            <div class="history-empty">
-
-                <div class="icon">
-                    📝
-                </div>
-
-                <p>
-                    Your saved content will appear here.
-                </p>
-
-            </div>
-
         `;
 
-        return;
+        wordCount.textContent = "0 words";
+
+        statusMessage.textContent = "";
+        statusMessage.className = "status-message";
     }
 
 
-    // Create history cards
+    // =========================
+    // SAVE HISTORY
+    // =========================
 
-    historyList.innerHTML = "";
+    function saveToHistory() {
 
+        if (!currentContent) {
+            alert("Generate some content before saving.");
+            return;
+        }
 
-    history.forEach(item => {
+        const history =
+            JSON.parse(localStorage.getItem("contentHistory") || "[]");
 
-        const card =
-            document.createElement("div");
+        const item = {
+            id: Date.now(),
+            topic: topicInput.value.trim(),
+            type: contentType.value,
+            content: currentContent,
+            date: new Date().toLocaleString()
+        };
 
+        history.unshift(item);
 
-        card.className =
-            "history-card";
-
-
-        card.innerHTML = `
-
-            <div class="history-card-header">
-
-                <span>
-                    📄 Saved Content
-                </span>
-
-                <small>
-                    ${item.date}
-                </small>
-
-            </div>
-
-
-            <div class="history-content">
-
-                ${escapeHtml(item.content)}
-
-            </div>
-
-
-            <div class="history-actions">
-
-                <button
-                    onclick="loadHistory(${item.id})"
-                >
-                    ↩️ Load
-                </button>
-
-
-                <button
-                    onclick="deleteHistory(${item.id})"
-                >
-                    🗑️ Delete
-                </button>
-
-            </div>
-
-        `;
-
-
-        historyList.appendChild(card);
-
-    });
-
-}
-
-
-
-// ==========================================
-// LOAD SAVED CONTENT
-// ==========================================
-
-function loadHistory(id) {
-
-    const history =
-        JSON.parse(
-            localStorage.getItem("contentHistory")
-        ) || [];
-
-
-    const item =
-        history.find(
-            historyItem => historyItem.id === id
+        localStorage.setItem(
+            "contentHistory",
+            JSON.stringify(history)
         );
-
-
-    if (!item) {
-
-        alert("Saved content could not be found.");
-
-        return;
-    }
-
-
-    // Put saved content into result box
-
-    document.getElementById("result").textContent =
-        item.content;
-
-
-    // Update word count
-
-    updateWordCount(item.content);
-
-
-    // Scroll to result
-
-    document.getElementById("result").scrollIntoView({
-
-        behavior: "smooth",
-
-        block: "center"
-
-    });
-
-}
-
-
-
-// ==========================================
-// DELETE ONE HISTORY ITEM
-// ==========================================
-
-function deleteHistory(id) {
-
-    const confirmed =
-        confirm(
-            "Are you sure you want to delete this saved content?"
-        );
-
-
-    if (!confirmed) {
-
-        return;
-    }
-
-
-    let history =
-        JSON.parse(
-            localStorage.getItem("contentHistory")
-        ) || [];
-
-
-    history =
-        history.filter(
-            item => item.id !== id
-        );
-
-
-    localStorage.setItem(
-        "contentHistory",
-        JSON.stringify(history)
-    );
-
-
-    displayHistory();
-
-}
-
-
-
-// ==========================================
-// CLEAR ALL HISTORY
-// ==========================================
-
-function clearHistory() {
-
-    const history =
-        JSON.parse(
-            localStorage.getItem("contentHistory")
-        ) || [];
-
-
-    if (history.length === 0) {
-
-        alert("There is no history to clear.");
-
-        return;
-    }
-
-
-    const confirmed =
-        confirm(
-            "Are you sure you want to clear all saved content?"
-        );
-
-
-    if (!confirmed) {
-
-        return;
-    }
-
-
-    localStorage.removeItem(
-        "contentHistory"
-    );
-
-
-    displayHistory();
-
-
-    alert("History cleared.");
-
-}
-
-
-
-// ==========================================
-// SECURITY HELPER
-// ==========================================
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement("div");
-
-
-    div.textContent = text;
-
-
-    return div.innerHTML;
-
-}
-
-
-
-// ==========================================
-// DARK MODE
-// ==========================================
-
-function toggleTheme() {
-
-    document.body.classList.toggle("dark");
-
-
-    const button =
-        document.getElementById("themeButton");
-
-
-    if (
-        document.body.classList.contains("dark")
-    ) {
-
-        button.textContent = "☀️";
-
-    }
-
-    else {
-
-        button.textContent = "🌙";
-
-    }
-
-}
-
-
-
-// ==========================================
-// LOAD HISTORY WHEN PAGE OPENS
-// ==========================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
 
         displayHistory();
 
+        statusMessage.textContent = "Content saved to history!";
+        statusMessage.className = "status-message success";
     }
-);
+
+
+    // =========================
+    // DISPLAY HISTORY
+    // =========================
+
+    function displayHistory() {
+
+        const history =
+            JSON.parse(localStorage.getItem("contentHistory") || "[]");
+
+        historyList.innerHTML = "";
+
+        if (history.length === 0) {
+
+            historyList.innerHTML = `
+                <div class="history-empty">
+                    <p>No saved content yet.</p>
+                </div>
+            `;
+
+            return;
+        }
+
+        history.forEach(function (item) {
+
+            const card = document.createElement("div");
+
+            card.className = "history-item";
+
+            card.innerHTML = `
+                <div class="history-info">
+                    <h3>${escapeHtml(item.topic)}</h3>
+                    <span>${escapeHtml(item.type)} · ${escapeHtml(item.date)}</span>
+                </div>
+
+                <div class="history-actions">
+                    <button type="button" class="load-history">
+                        Load
+                    </button>
+
+                    <button type="button" class="delete-history">
+                        Delete
+                    </button>
+                </div>
+            `;
+
+            card.querySelector(".load-history")
+                .addEventListener("click", function () {
+                    currentContent = item.content;
+                    result.textContent = currentContent;
+                    updateWordCount();
+                    window.scrollTo({
+                        top: result.offsetTop - 100,
+                        behavior: "smooth"
+                    });
+                });
+
+            card.querySelector(".delete-history")
+                .addEventListener("click", function () {
+
+                    const updatedHistory =
+                        history.filter(function (historyItem) {
+                            return historyItem.id !== item.id;
+                        });
+
+                    localStorage.setItem(
+                        "contentHistory",
+                        JSON.stringify(updatedHistory)
+                    );
+
+                    displayHistory();
+                });
+
+            historyList.appendChild(card);
+        });
+    }
+
+
+    // =========================
+    // CLEAR HISTORY
+    // =========================
+
+    function clearHistory() {
+
+        if (!confirm("Are you sure you want to clear your content history?")) {
+            return;
+        }
+
+        localStorage.removeItem("contentHistory");
+
+        displayHistory();
+    }
+
+
+    // =========================
+    // REGENERATE
+    // =========================
+
+    function regenerateContent() {
+
+        if (!topicInput.value.trim()) {
+            alert("Please enter a topic first.");
+            topicInput.focus();
+            return;
+        }
+
+        generateContent();
+    }
+
+
+    // =========================
+    // ESCAPE HTML
+    // =========================
+
+    function escapeHtml(text) {
+
+        const div = document.createElement("div");
+
+        div.textContent = text;
+
+        return div.innerHTML;
+    }
+
+
+    // =========================
+    // BUTTON EVENTS
+    // =========================
+
+    themeButton.addEventListener("click", toggleTheme);
+
+    generateButton.addEventListener("click", generateContent);
+
+    copyButton.addEventListener("click", copyContent);
+
+    downloadButton.addEventListener("click", downloadContent);
+
+    saveButton.addEventListener("click", saveToHistory);
+
+    clearButton.addEventListener("click", clearContent);
+
+    regenerateButton.addEventListener("click", regenerateContent);
+
+    clearHistoryButton.addEventListener("click", clearHistory);
+
+
+    // =========================
+    // CTRL + ENTER
+    // =========================
+
+    topicInput.addEventListener("keydown", function (event) {
+
+        if (event.ctrlKey && event.key === "Enter") {
+            generateContent();
+        }
+    });
+
+
+    // =========================
+    // START APP
+    // =========================
+
+    loadTheme();
+
+    displayHistory();
+
+});
